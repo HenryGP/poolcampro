@@ -4,15 +4,15 @@
 ```
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
-1. Install Python
+2. Install Python
 ```
 brew install python
 ```
-1. Install OpenCV
+3. Install OpenCV
 ```
 brew install opencv
 ```
-1. Final setup step
+4. Final setup step
 ```
 brew info opencv
 ```
