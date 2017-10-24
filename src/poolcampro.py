@@ -41,11 +41,8 @@ def capture_video(file_path, calibration):
                 cv2.circle(frame,(i[0], i[1]), 2, (0, 0, 255), 2)
             cv2.imshow('frame', frame)
         else:
-            #cropped_frame = frame[200:400, 100:300] # Crop from x, y, w, h -> 100, 200, 300, 400
             cropped_frame = frame[y:y+h,x:x+w]
-            # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
-            cv2.imshow("cropped", cropped_frame)
-
+            cv2.imshow('cropped', cropped_frame)
 
         if cv2.waitKey(1) & 0xFF == ord('c'):
             table.calibrated(True)
@@ -68,5 +65,4 @@ if args.mode=='live':
     sys.exit()
 else: #Read from file
     video_file = args.file
-print calibration
 capture_video(args.file, calibration)
