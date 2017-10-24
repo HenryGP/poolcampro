@@ -8,7 +8,7 @@ import cv2
 import os
 from table import Table
 
-def capture_video(file_path, calibration=True):
+def capture_video(file_path, calibration):
     cap = cv2.VideoCapture(file_path)
 
     if calibration:
@@ -32,13 +32,21 @@ def capture_video(file_path, calibration=True):
             table.calibrate_table(circles)
         circles, shape = table.get_table_details()
         x, y, w, h=cv2.boundingRect(shape)
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
-        for i in circles[0,:]:
-            # draw the outer circle
-            cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 1)
-            # draw the center of the circle
-            cv2.circle(frame,(i[0], i[1]), 2, (0, 0, 255), 2)
-        cv2.imshow('frame', frame)
+        if calibration and not table.is_calibrated(): #Draw rectangle and circles with the whole video if calibrating
+            cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+            for i in circles[0,:]:
+                # draw the outer circle
+                cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 1)
+                # draw the center of the circle
+                cv2.circle(frame,(i[0], i[1]), 2, (0, 0, 255), 2)
+            cv2.imshow('frame', frame)
+        else:
+            #cropped_frame = frame[200:400, 100:300] # Crop from x, y, w, h -> 100, 200, 300, 400
+            cropped_frame = frame[y:y+h,x:x+w]
+            # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
+            cv2.imshow("cropped", cropped_frame)
+
+
         if cv2.waitKey(1) & 0xFF == ord('c'):
             table.calibrated(True)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -50,21 +58,15 @@ def capture_video(file_path, calibration=True):
 parser = argparse.ArgumentParser()
 parser.add_argument("mode", help="live|file")
 parser.add_argument("-f","--file", help="absolute path to video file to stream from")
-parser.add_argument("-c","--calibrate", help="start the program for calibration of the table",action="store_true")
-parser.add_argument("-v", "--verbose", help="increase output verbosity",action="store_true")
+parser.add_argument("-c","--calibrate", help="start the program for calibration of the table",action='store_true')
+parser.add_argument("-v", "--verbose", help="increase output verbosity",action='store_true')
 args = parser.parse_args()
-
 verbose = args.verbose
-calibration = False
-
+calibration = args.calibrate
 if args.mode=='live':
     print "This mode is not implemented yet"
     sys.exit()
 else: #Read from file
     video_file = args.file
-    
-if args.calibrate==True:
-    video_file = args.file
-    calibration = args.calibrate
-
+print calibration
 capture_video(args.file, calibration)
